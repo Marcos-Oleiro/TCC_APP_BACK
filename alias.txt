@@ -1,0 +1,8 @@
+alias ls="ls --color=auto"
+alias l="ls --color=auto"
+alias serveron="JWT_KEY='gK0gNq1hjymQLAeDTYbnbjVYsOaj4xTIYn8u9o9Wx' php -d variables_order=EGPCS -S localhost:8080 -t public 
+alias appon="cordova run browser -- --live-reload"
+alias nodevars="PATH=$PATH:/home/spellzito/TCC/TCC_REPO/node_modules/.bin"
+alias notouchpad="synclient TouchpadOff=1"
+alias touchpadyes="synclient TouchpadOff=0"
+alias pgsql="psql -U postgres -d tcc_app"

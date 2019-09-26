@@ -1,0 +1,2 @@
+$ cordova plugin add cordova-plugin-browsersync
+$ cordova run browser -- --live-reload

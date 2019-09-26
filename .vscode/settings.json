@@ -1,0 +1,14 @@
+{
+    "editor.minimap.enabled": false,
+    "window.zoomLevel": -2,
+    "extensions.ignoreRecommendations": true,
+    "sublimeTextKeymap.promptV3Features": true,
+    "editor.multiCursorModifier": "ctrlCmd",
+    "editor.snippetSuggestions": "top",
+    "editor.formatOnPaste": true,
+    "workbench.startupEditor": "newUntitledFile",
+    "editor.fontSize": 14,
+    "editor.formatOnSave": true,
+    "php.validate.enable": true,
+    "intelephense.formatProvider.enable": true
+}
