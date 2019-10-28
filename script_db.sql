@@ -1,3 +1,7 @@
+DROP database tcc_app;
+
+CREATE database tcc_app;
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     nickname character varying(20) NOT NULL,

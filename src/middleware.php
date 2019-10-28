@@ -2,6 +2,8 @@
 <?php
 // Application middleware
 // e.g: $app->add(new \Slim\Csrf\Guard);
+
+$app->jwt_key = getenv("JWT_KEY");
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
 });

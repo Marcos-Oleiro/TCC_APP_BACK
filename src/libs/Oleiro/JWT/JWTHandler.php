@@ -8,6 +8,8 @@ use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha512;
 
+define("JWT_SECRET", getenv("JWT_KEY"));
+
 class JWTHandler
 {
 
@@ -22,7 +24,7 @@ class JWTHandler
         // ->setExpiration(time() + 3600) // Configures the expiration time of the token (exp claim)
             ->setSubject($user_id)
             ->set('valid', true)
-            ->sign($signer, $_ENV["JWT_KEY"]) // creates a signature using "testing" as key
+            ->sign($signer, JWT_SECRET) // creates a signature using "testing" as key
             ->getToken(); // Retrieves the generated token
 
         return $token;
@@ -46,7 +48,7 @@ class JWTHandler
         }
 
         // verificar a autenticidade
-        if (!$token->verify($signer, $_ENV['JWT_KEY'])) {
+        if (!$token->verify($signer, JWT_SECRET)) {
             return false;
         }
 

@@ -12,6 +12,7 @@ use Slim\Http\Response;
 // Routes
 $app->get('/hello/{name}', function ($request, $response, $args) {
     $string = "hello " . $args['name'];
+
     return $response->withJson($string);
 });
 $app->get('/games', function (Request $request, Response $response, array $args) {
@@ -153,6 +154,7 @@ $app->get('/home/{id}', function (Request $request, Response $response, array $a
 });
 // salva no banco de dados a nova descrição
 $app->put('/profile/edit/desc/{id}', function (Request $request, Response $response, array $args) {
+
     $new_desc = $this->request->getParsedBody()['new_description'];
     $id = DataHandler::idDecryptor($args['id']);
     $tkn_auth = $request->getHeader("HTTP_AUTHORIZATION")[0];
@@ -194,18 +196,16 @@ $app->post('/changepasswd/{id}', function (Request $request, Response $response,
     }
     return $response->withStatus(200);
 });
-$app->get('/profile/desc/{id}', function (Request $request, Response $response, array $args) {
+// $app->get('/profile/desc/{id}', function (Request $request, Response $response, array $args) {
 
-    $tkn_auth = $request->getHeader("HTTP_AUTHORIZATION")[0];
+//     $tkn_auth = $request->getHeader("HTTP_AUTHORIZATION")[0];
+//     $id = DataHandler::idDecryptor($args{'id'});
+//     if (!JWTHandler::verifyToken($tkn_auth, $id)) {
+//         return $response->withStatus(401);
+//     }
+//     $db_con = $this->db;
 
-    if (!JWTHandler::verifyToken($tkn_auth, $id)) {
-        return $response->withStatus(401);
-    }
-
-
-    echo $tkn_auth;
-    die();
-});
+// });
 $app->get('/[{name}]', function (Request $request, Response $response, array $args) {
     // Sample log message
     $this->logger->info("Slim-Skeleton '/' route");
