@@ -39,3 +39,10 @@ INSERT INTO games (name) VALUES ('jogo2');
 INSERT INTO games (name) VALUES ('jogo3');
 
 INSERT INTO users (nickname, passwd, email) VALUES ('spellzito','d3d26f1e61ff157eb2e41f7ef2f6f47f3e67164e440eb27cfe2ee3a3d7e3cd69','spellzito@oleirosoftware.com.br');
+
+CREATE TABLE positions(
+	id_user INTEGER,
+	lat 	DOUBLE PRECISION, 
+	long	DOUBLE PRECISION,
+	time	TIMESTAMP DEFAULT NOW()	
+);

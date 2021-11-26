@@ -97,6 +97,7 @@ $app->post('/login', function (Request $request, Response $response, array $args
     // inserir um novo item dentro do array para poder utilizar as mesmas funções que foram usadas no formulário de registro.
     $user_data['nickname'] = 'nickname';
 
+    // print_r(var_dump($user_data));
     // verifique se os campos estão vazios
 
     if (!Validator::checkEmptyFields($user_data)) {
@@ -118,7 +119,8 @@ $app->post('/login', function (Request $request, Response $response, array $args
                 $str_json = json_encode($message);
                 // campos verificados, usuário verificado, token gerado
                 // retorna token e http code 200 - OK
-                return $response->withJson($str_json)->withStatus(200);
+                // return $response->withJson($str_json)->withStatus(200);
+                return $response->withJson($message)->withStatus(200);
             } else { // dados não batendo com os dados do banco de dados
                 $body = $response->getBody();
                 $body->write(json_encode(array('erro' => $db_data)));
@@ -212,3 +214,17 @@ $app->get('/[{name}]', function (Request $request, Response $response, array $ar
     // Render index view
     return $this->renderer->render($response, 'index.phtml', $args);
 });
+
+// TODO arrumar autenticação!
+
+$app->post('/updateLocation/{id}',function (Request $request, Response $response, array $args){
+
+    $data = array('latitude' => $request->getParsedBody()['coordLat'], 'longitude' => $request->getParsedBody()['coordLong']);
+    $db_con = $this->db;
+    
+    DBHandler::updateLocation($args['id'], $data['latitude'], $data['longitude'], $db_con);
+
+    return $response->withJson($data);
+});
+
+// fazer view para pegar atualizações dos ultimos 90seg e nessa view tem que ter a query para pegar no raio, usando post gis/geo queries

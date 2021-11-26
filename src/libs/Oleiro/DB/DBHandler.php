@@ -118,4 +118,17 @@ class DBHandler
         return $result;
     }
 
+
+    public static function updateLocation( $id, $lat, $long, $db_con){
+
+        $stmt = $db_con->prepare("INSERT INTO positions (id_user, lat, long) VALUES (:id, :lat , :long)");
+
+        $stmt->bindParam(":id", $id);
+        $stmt->bindParam(":lat", $lat);
+        $stmt->bindParam(":long", $long);
+
+        $result = $stmt->execute();
+        return $result;
+    }
+
 }
