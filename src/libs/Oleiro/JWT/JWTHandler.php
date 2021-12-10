@@ -57,14 +57,12 @@ class JWTHandler
     // validar o tipo do token
     public static function validateAuthType($auth_string)
     {
-
         $auth_type = strtolower(explode(" ", $auth_string)[0]);
         return (strcmp($auth_type, "bearer") == 0);
     }
     // função para fazer a verificação total do token
     public static function verifyToken($tkn_auth, $id)
     {
-
         if (!self::validateAuthType($tkn_auth)) {
             return false;
         }

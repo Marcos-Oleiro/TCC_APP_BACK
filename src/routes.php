@@ -10,11 +10,11 @@ use Slim\Http\Response;
 
 // require dirname(__FILE__) . '/../libs/AuxFunc.php';
 // Routes
-$app->get('/hello/{name}', function ($request, $response, $args) {
-    $string = "hello " . $args['name'];
-
-    return $response->withJson($string);
-});
+//$app->get('/hello/{name}', function ($request, $response, $args) {
+//    $string = "hello " . $args['name'];
+//
+//    return $response->withJson($string);
+//});
 $app->get('/games', function (Request $request, Response $response, array $args) {
 
     $stmt = $this->db->query("SELECT * FROM games");
@@ -198,16 +198,15 @@ $app->post('/changepasswd/{id}', function (Request $request, Response $response,
     }
     return $response->withStatus(200);
 });
-// $app->get('/profile/desc/{id}', function (Request $request, Response $response, array $args) {
+$app->get('/profile/desc/{id}', function (Request $request, Response $response, array $args) {
 
-//     $tkn_auth = $request->getHeader("HTTP_AUTHORIZATION")[0];
-//     $id = DataHandler::idDecryptor($args{'id'});
-//     if (!JWTHandler::verifyToken($tkn_auth, $id)) {
-//         return $response->withStatus(401);
-//     }
-//     $db_con = $this->db;
-
-// });
+     $tkn_auth = $request->getHeader("HTTP_AUTHORIZATION")[0];
+     $id = DataHandler::idDecryptor($args{'id'});
+     if (!JWTHandler::verifyToken($tkn_auth, $id)) {
+         return $response->withStatus(401);
+     }
+     $db_con = $this->db;
+ });
 $app->get('/[{name}]', function (Request $request, Response $response, array $args) {
     // Sample log message
     $this->logger->info("Slim-Skeleton '/' route");
@@ -217,12 +216,27 @@ $app->get('/[{name}]', function (Request $request, Response $response, array $ar
 
 // TODO arrumar autenticação!
 
-$app->post('/updateLocation/{id}',function (Request $request, Response $response, array $args){
+$app->post('/updateLocation/{id}',function (Request $request, Response $response, array $args) {
 
+    $id = DataHandler::idDecryptor($args['id']);
+    $tkn_auth = $request->getHeader("HTTP_AUTHORIZATION")[0];
+
+    if (!JWTHandler::verifyToken($tkn_auth, $id)) {
+        return $response->withStatus(401);
+    }
     $data = array('latitude' => $request->getParsedBody()['coordLat'], 'longitude' => $request->getParsedBody()['coordLong']);
     $db_con = $this->db;
-    
-    DBHandler::updateLocation($args['id'], $data['latitude'], $data['longitude'], $db_con);
+    DBHandler::updateLocation($id, $data['latitude'], $data['longitude'], $db_con);
+
+    return $response->withJson($data,200);
+});
+
+$app->get('/createLocation/all',function (Request $request, Response $response, array $args){
+
+    $db_con = $this->db;
+
+    $data = array('mensagem'=>'localizações criadas');
+    DBHandler::createLocations($db_con);
 
     return $response->withJson($data);
 });
