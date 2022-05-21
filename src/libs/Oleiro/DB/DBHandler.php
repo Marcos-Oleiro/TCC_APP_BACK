@@ -1,6 +1,7 @@
 <?php
 
 namespace Oleiro\DB;
+
 header('Access-Control-Allow-Origin: *');
 
 
@@ -36,10 +37,12 @@ class DBHandler {
 
     // função que salva no banco de dados o usuário recém registrado
     public static function saveNewUser($nickname, $email, $passwd, $db_con) {
-        $stmt = $db_con->prepare("INSERT INTO users (nickname, email,passwd) VALUES(:nickname,:email,:passwd)");
+        $stmt = $db_con->prepare("INSERT INTO users (nickname, email,passwd, radius) VALUES(:nickname,:email,:passwd, :radius)");
+        $radius = 15;
         $stmt->bindParam(':nickname', $nickname);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':passwd', $passwd);
+        $stmt->bindParam(':radius', $radius);
         $stmt->execute();
     }
     // função devolve o password que vai ser salvo no banco de dados
@@ -59,7 +62,13 @@ class DBHandler {
         if ($row != false) {
             if ($row['passwd'] == $passwd) {
                 // return print_r($row);
-                return $row['id'];
+//                return $row['id'];
+                return array(
+                    'id' => $row['id'],
+                    'radius' => $row['radius'],
+                    'nickname' => $row['nickname']
+
+                );
             } else {
                 return 'Senha incorreta';
             }
@@ -121,12 +130,28 @@ class DBHandler {
         return $stmt->execute();
     }
 
+    public static function findUserPerDistance ($db_con,$lat, $long, $distance, $id){
+
+        $stmt = $db_con->prepare("SELECT b.id,b.nickname, a.lat, a.long,ROUND(earth_distance(ll_to_earth(:lt, :lg), 
+                ll_to_earth(lat, long)) :: NUMERIC,2) AS distance FROM positions a INNER JOIN users b 
+                on a.id_user=b.id WHERE earth_box(ll_to_earth (:lt, :lg), :dstc) @> ll_to_earth (lat, long) 
+                AND earth_distance(ll_to_earth (:lt, :lg), ll_to_earth (lat, long)) < :dstc and b.id != :id ORDER BY distance;");
+
+        $stmt->bindParam(":lt",$lat);
+        $stmt->bindParam(":lg",$long);
+        $stmt->bindParam(":dstc",$distance);
+        $stmt->bindParam(":id",$id);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+
+    }
     public static function createLocations($db_con) {
 
         //origem
         $id1 = 1;
-        $lat1 = -32.179610591117964;
-        $long1 = -52.15311424207091;
+        $lat1 = -32.179611;
+        $long1 = -52.153114;
         $stmt1 = $db_con->prepare("INSERT INTO positions (id_user, lat, long) VALUES (:id, :lat , :long)");
         $stmt1->bindParam(":id", $id1);
         $stmt1->bindParam(":lat", $lat1);
@@ -135,8 +160,8 @@ class DBHandler {
 
         //5km
         $id2 = 2;
-        $lat2 = -32.165899497787876;
-        $long2 = -52.19659327096146;
+        $lat2 = -32.165899;
+        $long2 = -52.196593;
         $stmt2 = $db_con->prepare("INSERT INTO positions (id_user, lat, long) VALUES (:id, :lat , :long)");
         $stmt2->bindParam(":id", $id2);
         $stmt2->bindParam(":lat", $lat2);
@@ -145,8 +170,8 @@ class DBHandler {
 
         //10km
         $id3 = 3;
-        $lat3 = -32.14958523679106;
-        $long3 = -52.2197613553122;
+        $lat3 = -32.149585;
+        $long3 = -52.219761;
         $stmt3 = $db_con->prepare("INSERT INTO positions (id_user, lat, long) VALUES (:id, :lat , :long)");
         $stmt3->bindParam(":id", $id3);
         $stmt3->bindParam(":lat", $lat3);
@@ -155,8 +180,8 @@ class DBHandler {
 
         //15km
         $id4 = 4;
-        $lat4 = -32.10985633968866;
-        $long4 = -52.26383899832227;
+        $lat4 = -32.109856;
+        $long4 = -52.263839;
         $stmt4 = $db_con->prepare("INSERT INTO positions (id_user, lat, long) VALUES (:id, :lat , :long)");
         $stmt4->bindParam(":id", $id4);
         $stmt4->bindParam(":lat", $lat4);
@@ -165,8 +190,8 @@ class DBHandler {
 
         //20km
         $id5 = 5;
-        $lat5 = -32.07907897787356;
-        $long5 = -52.30727055235952;
+        $lat5 = -32.079079;
+        $long5 = -52.307271;
         $stmt5 = $db_con->prepare("INSERT INTO positions (id_user, lat, long) VALUES (:id, :lat , :long)");
         $stmt5->bindParam(":id", $id5);
         $stmt5->bindParam(":lat", $lat5);

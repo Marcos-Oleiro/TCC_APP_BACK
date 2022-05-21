@@ -74,7 +74,7 @@ $app->post('/users', function (Request $request, Response $response, array $args
                     return $response->withStatus(400);
                 }
 
-                $user_data['passwd'] = dbPass($user_data['passwd']);
+                $user_data['passwd'] = DataHandler::dbPass($user_data['passwd']);
                 DBHandler::saveNewUser($user_data['nickname'], $user_data['email'], $user_data['passwd'], $db_con);
                 return $response->withStatus(201)->write("ok!");
             }
@@ -108,13 +108,15 @@ $app->post('/login', function (Request $request, Response $response, array $args
         // if (testFieldsNames($user_data)) {
         if (Validator::testFieldsNames($user_data)) {
             $db_data = DBHandler::checkUser($user_data['email'], DataHandler::dbPass($user_data['passwd']), $db_con);
-            $token = JWTHandler::jwtBuilder($db_data);
-            if (is_numeric($db_data)) { // se os dados estiverem corretos
-                $response = $response->withHeader('id', DataHandler::idEncryptor($db_data))
+            $token = JWTHandler::jwtBuilder($db_data['id']);
+            if (is_array($db_data)) { // se os dados estiverem corretos
+                $response = $response->withHeader('id', DataHandler::idEncryptor($db_data['id']))
                     ->withHeader("Access-Control-Expose-Headers", "id");
                 //  transformar o objeto token em string para enviar para o cliente
                 $message = array(
                     'token' => (string) $token,
+                    'radius' => $db_data['radius'],
+                    'nickname' => $db_data['nickname'],
                 );
                 $str_json = json_encode($message);
                 // campos verificados, usuário verificado, token gerado
@@ -214,8 +216,6 @@ $app->get('/[{name}]', function (Request $request, Response $response, array $ar
     return $this->renderer->render($response, 'index.phtml', $args);
 });
 
-// TODO arrumar autenticação!
-
 $app->post('/updateLocation/{id}',function (Request $request, Response $response, array $args) {
 
     $id = DataHandler::idDecryptor($args['id']);
@@ -231,6 +231,32 @@ $app->post('/updateLocation/{id}',function (Request $request, Response $response
     return $response->withJson($data,200);
 });
 
+$app->get('/getusers/all/{id}',function (Request $request, Response $response, array $args){
+
+    $id = DataHandler::idDecryptor($args['id']);
+    $tkn_auth = $request->getHeader("HTTP_AUTHORIZATION")[0];
+
+    if (!JWTHandler::verifyToken($tkn_auth, $id)) {
+        return $response->withStatus(401);
+    }
+
+    $db_con = $this->db;
+    $distance = $request->getQueryParam('distance');
+    $lat = $request->getQueryParam('lat');
+    $long = $request->getQueryParam('long');
+
+    if( !isset($distance) || !isset($lat) || !isset($long)){
+
+        $body = $response->getBody();
+        $body->write(json_encode(array('erro' => "Parâmetros faltando")));
+        return $response->withStatus(400);
+    }
+//    $data = DBHandler::findUserPerDistance($db_con,-32.179610591118,-52.153114242071, 10000 );
+    $data = DBHandler::findUserPerDistance($db_con,$lat,$long, $distance, $id);
+    return $response->withJson($data);
+
+});
+
 $app->get('/createLocation/all',function (Request $request, Response $response, array $args){
 
     $db_con = $this->db;
@@ -240,5 +266,4 @@ $app->get('/createLocation/all',function (Request $request, Response $response, 
 
     return $response->withJson($data);
 });
-
 // fazer view para pegar atualizações dos ultimos 90seg e nessa view tem que ter a query para pegar no raio, usando post gis/geo queries
