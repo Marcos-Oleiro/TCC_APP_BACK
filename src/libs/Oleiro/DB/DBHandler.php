@@ -146,6 +146,17 @@ class DBHandler {
         return $stmt->fetchAll();
 
     }
+
+    public static function saveRadius($db_con, $radius, $id){
+
+        $stmt = $db_con->prepare("UPDATE users SET radius = :radius where id = :id");
+        $radius = $radius/1000;
+        $stmt->bindParam(":radius", $radius);
+        $stmt->bindParam(":id", $id);
+        return $stmt->execute();
+    }
+
+
     public static function createLocations($db_con) {
 
         //origem

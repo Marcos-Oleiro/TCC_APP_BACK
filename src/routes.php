@@ -252,6 +252,12 @@ $app->get('/getusers/all/{id}',function (Request $request, Response $response, a
         return $response->withStatus(400);
     }
 //    $data = DBHandler::findUserPerDistance($db_con,-32.179610591118,-52.153114242071, 10000 );
+
+    if (!DBHandler::saveRadius($db_con,$distance, $id)){
+        $body = $response->getBody();
+        $body->write(json_encode(array('erro' => "Erro ao atualziar o raio")));
+        return $response->withStatus(500);
+    }
     $data = DBHandler::findUserPerDistance($db_con,$lat,$long, $distance, $id);
     return $response->withJson($data);
 
